@@ -8,10 +8,10 @@ import LoadingScreen from './components/common/LoadingScreen';
 
 // Page components (lazy loaded for better performance)
 const Dashboard = React.lazy(() => import('./pages/Dashboard'));
-const Machines = React.lazy(() => import('./pages/Machines'));
-const Threats = React.lazy(() => import('./pages/Threats'));
-const Analytics = React.lazy(() => import('./pages/Analytics'));
-const Settings = React.lazy(() => import('./pages/Settings'));
+const Endpoints = React.lazy(() => import('./pages/Endpoints'));
+const ThreatDetection = React.lazy(() => import('./pages/ThreatDetection'));
+const SecurityAnalytics = React.lazy(() => import('./pages/SecurityAnalytics'));
+const Configuration = React.lazy(() => import('./pages/Configuration'));
 const Login = React.lazy(() => import('./pages/Login'));
 
 function App() {
@@ -36,10 +36,10 @@ function App() {
           <Routes>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/machines" element={<Machines />} />
-            <Route path="/threats" element={<Threats />} />
-            <Route path="/analytics" element={<Analytics />} />
-            <Route path="/settings" element={<Settings />} />
+            <Route path="/machines" element={<Endpoints />} />
+            <Route path="/threats" element={<ThreatDetection />} />
+            <Route path="/analytics" element={<SecurityAnalytics />} />
+            <Route path="/settings" element={<Configuration />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </Suspense>
