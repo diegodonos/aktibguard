@@ -40,7 +40,6 @@ import { motion } from 'framer-motion';
 const Endpoints = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [anchorEl, setAnchorEl] = useState(null);
-  const [selectedEndpoint, setSelectedEndpoint] = useState(null);
 
   // Sample endpoints data
   const endpoints = [
@@ -116,14 +115,12 @@ const Endpoints = () => {
     },
   ];
 
-  const handleMenuOpen = (event, endpoint) => {
+  const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
-    setSelectedEndpoint(endpoint);
   };
 
   const handleMenuClose = () => {
     setAnchorEl(null);
-    setSelectedEndpoint(null);
   };
 
   const getDeviceIcon = (type) => {
@@ -488,7 +485,7 @@ const Endpoints = () => {
                         
                         <TableCell>
                           <IconButton
-                            onClick={(e) => handleMenuOpen(e, endpoint)}
+                            onClick={handleMenuOpen}
                             sx={{
                               color: 'rgba(255, 255, 255, 0.6)',
                               '&:hover': {

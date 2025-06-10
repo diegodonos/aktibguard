@@ -43,16 +43,14 @@ import {
   Code as CodeIcon,
   Link as LinkIcon,
   Email as EmailIcon,
-  Storage as StorageIcon,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
-import { AreaChart, Area, LineChart, Line, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { AreaChart, Area, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 const ThreatDetection = () => {
   const [currentTab, setCurrentTab] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [anchorEl, setAnchorEl] = useState(null);
-  const [selectedThreat, setSelectedThreat] = useState(null);
 
   // Sample threat data
   const threats = [
@@ -152,14 +150,12 @@ const ThreatDetection = () => {
     setCurrentTab(newValue);
   };
 
-  const handleMenuOpen = (event, threat) => {
+  const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
-    setSelectedThreat(threat);
   };
 
   const handleMenuClose = () => {
     setAnchorEl(null);
-    setSelectedThreat(null);
   };
 
   const getSeverityConfig = (severity) => {
@@ -211,7 +207,7 @@ const ThreatDetection = () => {
       threat.endpoint.toLowerCase().includes(searchTerm.toLowerCase()) ||
       threat.user.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [searchTerm]);
+  }, [searchTerm, threats]);
 
   const stats = {
     total: threats.length,
@@ -645,7 +641,7 @@ const ThreatDetection = () => {
                         
                         <TableCell>
                           <IconButton
-                            onClick={(e) => handleMenuOpen(e, threat)}
+                            onClick={handleMenuOpen}
                             sx={{
                               color: 'rgba(255, 255, 255, 0.6)',
                               '&:hover': {
