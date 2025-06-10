@@ -165,6 +165,8 @@ services:
     container_name: aktibguard-frontend
     restart: unless-stopped
     environment:
+      HOST: 0.0.0.0
+      PORT: 3000
       NODE_ENV: ${NODE_ENV:-development}
       REACT_APP_API_URL: ${API_URL:-http://localhost:3000}
       REACT_APP_WS_URL: ${WS_URL:-ws://localhost:3000}
