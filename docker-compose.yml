@@ -88,7 +88,7 @@ services:
       DB_NAME: aktibguard
       DB_USER: aktibguard
       DB_PASSWORD: ${DB_PASSWORD:-AktibGuard2024!}
-      DB_SSL: false
+      DB_SSL: "false"
       DB_POOL_MIN: 2
       DB_POOL_MAX: 10
       
@@ -122,7 +122,7 @@ services:
       
       # Monitoring
       LOG_LEVEL: ${LOG_LEVEL:-info}
-      ENABLE_METRICS: true
+      ENABLE_METRICS: "true"
       METRICS_PORT: 9090
       
     volumes:
@@ -170,7 +170,7 @@ services:
       REACT_APP_WS_URL: ${WS_URL:-ws://localhost:3000}
       REACT_APP_VERSION: 1.1.0
       REACT_APP_BUILD_DATE: ${BUILD_DATE:-}
-      GENERATE_SOURCEMAP: false
+      GENERATE_SOURCEMAP: "false"
     volumes:
       - ./frontend:/app
       - /app/node_modules
