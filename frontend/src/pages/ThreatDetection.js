@@ -53,7 +53,7 @@ const ThreatDetection = () => {
   const [anchorEl, setAnchorEl] = useState(null);
 
   // Sample threat data
-  const threats = [
+  const threats = useMemo(() => [
     {
       id: 1,
       name: 'Trojan.Win32.GenKrypt',
@@ -124,7 +124,7 @@ const ThreatDetection = () => {
       hash: 'r5t6y7u8i9o0...',
       riskScore: 55,
     },
-  ];
+  ], []);
 
   // Sample timeline data
   const timelineData = [

@@ -637,13 +637,6 @@ const SecurityAnalytics = () => {
                 <BarChart data={incidentTrends}>
                   <Bar dataKey="incidents" fill="#ff6b6b" radius={[4, 4, 0, 0]} />
                   <Bar dataKey="resolved" fill="#4caf50" radius={[4, 4, 0, 0]} />
-                  <Line 
-                    type="monotone" 
-                    dataKey="mttr" 
-                    stroke="#00d4ff" 
-                    strokeWidth={2}
-                    dot={{ fill: '#00d4ff', strokeWidth: 2, r: 4 }}
-                  />
                 </BarChart>
               </ResponsiveContainer>
             </Box>
@@ -659,12 +652,6 @@ const SecurityAnalytics = () => {
                 <Box sx={{ width: 12, height: 3, backgroundColor: '#4caf50', borderRadius: 1 }} />
                 <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
                   Resolved
-                </Typography>
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Box sx={{ width: 12, height: 3, backgroundColor: '#00d4ff', borderRadius: 1 }} />
-                <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
-                  MTTR (hours)
                 </Typography>
               </Box>
             </Box>
