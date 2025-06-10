@@ -1,11 +1,10 @@
 import React from 'react';
-import { Grid, Card, CardContent, Typography, Box, IconButton } from '@mui/material';
+import { Grid, Card, CardContent, Typography, Box } from '@mui/material';
 import {
   Computer as ComputerIcon,
   Warning as WarningIcon,
   Shield as ShieldIcon,
   TrendingUp as TrendingUpIcon,
-  MoreVert as MoreVertIcon,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import StatusIndicator from '../common/StatusIndicator';

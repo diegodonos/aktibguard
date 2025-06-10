@@ -1,10 +1,9 @@
 import React from 'react';
-import { Card, CardContent, Typography, Box, Chip, IconButton, List, ListItem, Avatar } from '@mui/material';
+import { Card, CardContent, Typography, Box, Chip, List, ListItem, Avatar } from '@mui/material';
 import { 
   Warning as WarningIcon, 
   Error as ErrorIcon, 
   Info as InfoIcon,
-  MoreVert as MoreVertIcon,
   Computer as ComputerIcon 
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';

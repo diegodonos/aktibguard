@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, Typography, Box, Grid } from '@mui/material';
 import { TrendingUp as TrendingUpIcon } from '@mui/icons-material';
-import { LineChart, Line, Area, AreaChart, XAxis, YAxis, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, Area, AreaChart, ResponsiveContainer } from 'recharts';
 import { motion } from 'framer-motion';
 
 const SystemMetrics = () => {

@@ -42,7 +42,7 @@ const NetworkMap = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [nodes]);
 
   const getNodeColor = (type, status) => {
     if (status === 'critical') return '#ff4757';

@@ -3,17 +3,9 @@ import {
   Box,
   Grid,
   Typography,
-  Card,
-  CardContent,
   IconButton,
-  Chip,
 } from '@mui/material';
 import {
-  Security as SecurityIcon,
-  Computer as ComputerIcon,
-  Warning as WarningIcon,
-  Shield as ShieldIcon,
-  TrendingUp as TrendingUpIcon,
   Refresh as RefreshIcon,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';

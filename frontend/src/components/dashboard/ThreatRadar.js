@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, Typography, Box, Chip } from '@mui/material';
-import { Warning as WarningIcon, GPS as RadarIcon } from '@mui/icons-material';
+import { Radar as RadarIcon } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 
 const ThreatRadar = () => {

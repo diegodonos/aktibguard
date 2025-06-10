@@ -8,13 +8,11 @@ import {
   ListItemIcon,
   ListItemText,
   Typography,
-  Divider,
   Chip,
 } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
   Computer as ComputerIcon,
-  Security as SecurityIcon,
   Analytics as AnalyticsIcon,
   Settings as SettingsIcon,
   Warning as WarningIcon,
