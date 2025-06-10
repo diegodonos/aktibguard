@@ -15,7 +15,7 @@ import {
   Shield as ShieldIcon,
   TrendingUp as TrendingUpIcon,
   Refresh as RefreshIcon,
-} from '@mui/material/icons';
+} from '@mui/icons-material';
 import { motion } from 'framer-motion';
 
 // Import custom components
