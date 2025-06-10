@@ -1,0 +1,369 @@
+# ============================================================================
+# AktibGuard - Production Ready Docker Compose
+# Cybersecurity Platform for SMEs
+# ============================================================================
+
+version: '3.8'
+
+services:
+  # ============================================================================
+  # DATABASE SERVICES
+  # ============================================================================
+  
+  # PostgreSQL Database
+  database:
+    image: postgres:15-alpine
+    container_name: aktibguard-database
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: aktibguard
+      POSTGRES_USER: aktibguard
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-AktibGuard2024!}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d
+      - ./database/backups:/backups
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    networks:
+      - aktibguard-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aktibguard -d aktibguard"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Redis Cache & Session Store
+  redis:
+    image: redis:7-alpine
+    container_name: aktibguard-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-AktibGuard2024!}
+    volumes:
+      - redis_data:/data
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    networks:
+      - aktibguard-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ============================================================================
+  # APPLICATION SERVICES
+  # ============================================================================
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        NODE_ENV: ${NODE_ENV:-development}
+    container_name: aktibguard-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 3000
+      
+      # Database Configuration
+      DB_HOST: database
+      DB_PORT: 5432
+      DB_NAME: aktibguard
+      DB_USER: aktibguard
+      DB_PASSWORD: ${DB_PASSWORD:-AktibGuard2024!}
+      DB_SSL: false
+      DB_POOL_MIN: 2
+      DB_POOL_MAX: 10
+      
+      # Redis Configuration
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-AktibGuard2024!}
+      REDIS_DB: 0
+      
+      # JWT Configuration
+      JWT_SECRET: ${JWT_SECRET:-aktibguard-super-secret-jwt-key-2024}
+      JWT_EXPIRE: 24h
+      JWT_REFRESH_EXPIRE: 7d
+      
+      # Security
+      BCRYPT_ROUNDS: 12
+      RATE_LIMIT_WINDOW: 900000
+      RATE_LIMIT_MAX: 100
+      
+      # Email Configuration
+      SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-noreply@aktibguard.com}
+      
+      # Application
+      APP_NAME: AktibGuard
+      APP_URL: ${APP_URL:-http://localhost:3001}
+      API_URL: ${API_URL:-http://localhost:3000}
+      
+      # Monitoring
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      ENABLE_METRICS: true
+      METRICS_PORT: 9090
+      
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - backend_uploads:/app/uploads
+      - backend_logs:/app/logs
+    ports:
+      - "${BACKEND_PORT:-3000}:3000"
+      - "${METRICS_PORT:-9090}:9090"
+    networks:
+      - aktibguard-network
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  # Frontend Dashboard
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NODE_ENV: ${NODE_ENV:-development}
+        REACT_APP_API_URL: ${API_URL:-http://localhost:3000}
+        REACT_APP_WS_URL: ${WS_URL:-ws://localhost:3000}
+        REACT_APP_VERSION: 1.1.0
+    container_name: aktibguard-frontend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      REACT_APP_API_URL: ${API_URL:-http://localhost:3000}
+      REACT_APP_WS_URL: ${WS_URL:-ws://localhost:3000}
+      REACT_APP_VERSION: 1.1.0
+      REACT_APP_BUILD_DATE: ${BUILD_DATE:-}
+      GENERATE_SOURCEMAP: false
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - frontend_build:/app/build
+    ports:
+      - "${FRONTEND_PORT:-3001}:3000"
+    networks:
+      - aktibguard-network
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ============================================================================
+  # ADMIN & MONITORING SERVICES
+  # ============================================================================
+
+  # Database Admin (pgAdmin)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: aktibguard-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@aktibguard.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-AktibGuard2024!}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./database/pgadmin/servers.json:/pgadmin4/servers.json
+    ports:
+      - "${PGADMIN_PORT:-8080}:80"
+    networks:
+      - aktibguard-network
+    depends_on:
+      - database
+    profiles:
+      - admin
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+  # Redis Admin (RedisInsight)
+  redis-insight:
+    image: redislabs/redisinsight:latest
+    container_name: aktibguard-redis-insight
+    restart: unless-stopped
+    volumes:
+      - redis_insight_data:/db
+    ports:
+      - "${REDIS_INSIGHT_PORT:-8001}:8001"
+    networks:
+      - aktibguard-network
+    depends_on:
+      - redis
+    profiles:
+      - admin
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+  # ============================================================================
+  # PRODUCTION SERVICES
+  # ============================================================================
+
+  # Nginx Reverse Proxy (Production)
+  nginx:
+    image: nginx:alpine
+    container_name: aktibguard-nginx
+    restart: unless-stopped
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./ssl:/etc/nginx/ssl
+      - frontend_build:/usr/share/nginx/html
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - aktibguard-network
+    depends_on:
+      - backend
+      - frontend
+    profiles:
+      - production
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Prometheus Monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: aktibguard-prometheus
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    volumes:
+      - ./monitoring/prometheus:/etc/prometheus
+      - prometheus_data:/prometheus
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    networks:
+      - aktibguard-network
+    profiles:
+      - monitoring
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+  # Grafana Dashboard
+  grafana:
+    image: grafana/grafana:latest
+    container_name: aktibguard-grafana
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-AktibGuard2024!}
+      GF_INSTALL_PLUGINS: grafana-clock-panel,grafana-simple-json-datasource
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+    ports:
+      - "${GRAFANA_PORT:-3100}:3000"
+    networks:
+      - aktibguard-network
+    depends_on:
+      - prometheus
+    profiles:
+      - monitoring
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+# ============================================================================
+# NETWORKS
+# ============================================================================
+networks:
+  aktibguard-network:
+    driver: bridge
+    name: aktibguard-network
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# ============================================================================
+# VOLUMES
+# ============================================================================
+volumes:
+  # Database
+  postgres_data:
+    name: aktibguard-postgres-data
+  redis_data:
+    name: aktibguard-redis-data
+  
+  # Application
+  backend_uploads:
+    name: aktibguard-backend-uploads
+  backend_logs:
+    name: aktibguard-backend-logs
+  frontend_build:
+    name: aktibguard-frontend-build
+  
+  # Admin Tools
+  pgadmin_data:
+    name: aktibguard-pgadmin-data
+  redis_insight_data:
+    name: aktibguard-redis-insight-data
+  
+  # Monitoring
+  prometheus_data:
+    name: aktibguard-prometheus-data
+  grafana_data:
+    name: aktibguard-grafana-data
