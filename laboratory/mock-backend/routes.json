@@ -1,0 +1,10 @@
+{
+  "/api/v1/endpoints": "/endpoints",
+  "/api/v1/threats": "/threats",
+  "/api/v1/analytics": "/analytics",
+  "/api/v1/dashboard": "/dashboard",
+  "/api/v1/users": "/users",
+  "/api/v1/auth/login": "/auth",
+  "/api/v1/auth/refresh": "/auth",
+  "/api/v1/health": "/health"
+}

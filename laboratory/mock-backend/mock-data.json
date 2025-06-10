@@ -1,0 +1,137 @@
+{
+  "endpoints": [
+    {
+      "id": 1,
+      "name": "DESKTOP-001",
+      "type": "desktop",
+      "os": "Windows 11 Pro",
+      "ip": "192.168.1.101",
+      "status": "online",
+      "lastSeen": "2 min ago",
+      "threats": 0,
+      "version": "1.2.5",
+      "user": "John Doe",
+      "department": "IT",
+      "riskScore": 15
+    },
+    {
+      "id": 2,
+      "name": "LAPTOP-005",
+      "type": "laptop",
+      "os": "macOS Ventura",
+      "ip": "192.168.1.142",
+      "status": "warning",
+      "lastSeen": "15 min ago",
+      "threats": 2,
+      "version": "1.2.3",
+      "user": "Sarah Connor",
+      "department": "Marketing",
+      "riskScore": 65
+    },
+    {
+      "id": 3,
+      "name": "SERVER-01",
+      "type": "server",
+      "os": "Ubuntu 22.04 LTS",
+      "ip": "192.168.1.10",
+      "status": "online",
+      "lastSeen": "1 min ago",
+      "threats": 0,
+      "version": "1.2.5",
+      "user": "System",
+      "department": "Infrastructure",
+      "riskScore": 8
+    }
+  ],
+  "threats": [
+    {
+      "id": 1,
+      "name": "Trojan.Win32.GenKrypt",
+      "type": "malware",
+      "severity": "critical",
+      "status": "active",
+      "endpoint": "WORKSTATION-007",
+      "user": "Lisa Anderson",
+      "detected": "2024-01-15 14:30:25",
+      "source": "Real-time Protection",
+      "path": "C:\\Windows\\Temp\\suspicious.exe",
+      "hash": "a1b2c3d4e5f6...",
+      "riskScore": 95
+    },
+    {
+      "id": 2,
+      "name": "Phishing Email Detection",
+      "type": "phishing",
+      "severity": "high",
+      "status": "quarantined",
+      "endpoint": "LAPTOP-005",
+      "user": "Sarah Connor",
+      "detected": "2024-01-15 13:15:10",
+      "source": "Email Scanner",
+      "path": "outlook://inbox/suspicious_email.msg",
+      "hash": "x9y8z7w6v5u4...",
+      "riskScore": 78
+    }
+  ],
+  "analytics": {
+    "securityScore": 94,
+    "threatDetectionRate": 98.7,
+    "meanTimeToResponse": 2.1,
+    "complianceScore": 87,
+    "securityMetrics": [
+      { "time": "Mon", "threats": 45, "blocked": 42, "incidents": 3 },
+      { "time": "Tue", "threats": 52, "blocked": 48, "incidents": 4 },
+      { "time": "Wed", "threats": 38, "blocked": 35, "incidents": 3 },
+      { "time": "Thu", "threats": 67, "blocked": 58, "incidents": 9 },
+      { "time": "Fri", "threats": 71, "blocked": 65, "incidents": 6 },
+      { "time": "Sat", "threats": 23, "blocked": 21, "incidents": 2 },
+      { "time": "Sun", "threats": 19, "blocked": 18, "incidents": 1 }
+    ]
+  },
+  "dashboard": {
+    "quickStats": {
+      "protectedEndpoints": 247,
+      "activeThreats": 3,
+      "securityScore": "94%",
+      "incidentsResolved": 156
+    },
+    "recentAlerts": [
+      {
+        "id": 1,
+        "type": "critical",
+        "title": "Malware Detected",
+        "description": "Suspicious file detected on DESKTOP-001",
+        "timestamp": "2 min ago",
+        "machine": "DESKTOP-001"
+      },
+      {
+        "id": 2,
+        "type": "warning",
+        "title": "Failed Login Attempt",
+        "description": "Multiple failed login attempts from 192.168.1.100",
+        "timestamp": "5 min ago",
+        "machine": "SERVER-01"
+      }
+    ]
+  },
+  "users": [
+    {
+      "id": 1,
+      "username": "admin",
+      "email": "admin@aktibguard.lab",
+      "role": "Administrator",
+      "status": "active",
+      "lastLogin": "2024-01-15T14:30:00Z"
+    }
+  ],
+  "auth": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.lab-token",
+    "refreshToken": "refresh-token-lab",
+    "user": {
+      "id": 1,
+      "username": "admin",
+      "email": "admin@aktibguard.lab",
+      "role": "Administrator"
+    }
+  }
+}

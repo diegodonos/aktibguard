@@ -1,0 +1,185 @@
+# ============================================================================
+# AktibGuard - Laboratory Testing Docker Compose
+# Optimized for testing and demonstration
+# ============================================================================
+
+version: '3.8'
+
+services:
+  # ============================================================================
+  # DATABASE SERVICES
+  # ============================================================================
+  
+  # PostgreSQL Database (Laboratory)
+  database:
+    image: postgres:15-alpine
+    container_name: aktibguard-database-lab
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: aktibguard_lab
+      POSTGRES_USER: aktibguard_lab
+      POSTGRES_PASSWORD: AktibGuard2024Lab!
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    volumes:
+      - postgres_lab_data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    networks:
+      - aktibguard-lab-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aktibguard_lab -d aktibguard_lab"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # Redis Cache (Laboratory)
+  redis:
+    image: redis:7-alpine
+    container_name: aktibguard-redis-lab
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass AktibGuard2024Lab!
+    volumes:
+      - redis_lab_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - aktibguard-lab-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ============================================================================
+  # APPLICATION SERVICES
+  # ============================================================================
+
+  # Frontend Dashboard (Laboratory)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NODE_ENV: production
+        REACT_APP_API_URL: http://192.168.1.100:3000
+        REACT_APP_WS_URL: ws://192.168.1.100:3000
+        REACT_APP_VERSION: 1.1.0
+        REACT_APP_ENVIRONMENT: laboratory
+    container_name: aktibguard-frontend-lab
+    restart: unless-stopped
+    environment:
+      HOST: 0.0.0.0
+      PORT: 3000
+      NODE_ENV: production
+      REACT_APP_API_URL: http://192.168.1.100:3000
+      REACT_APP_WS_URL: ws://192.168.1.100:3000
+      REACT_APP_VERSION: 1.1.0
+      REACT_APP_ENVIRONMENT: laboratory
+      GENERATE_SOURCEMAP: "false"
+    volumes:
+      - frontend_lab_build:/app/build
+    ports:
+      - "3001:3000"
+    networks:
+      - aktibguard-lab-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ============================================================================
+  # DEVELOPMENT & TESTING SERVICES
+  # ============================================================================
+
+  # Database Admin (pgAdmin) - Laboratory
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: aktibguard-pgadmin-lab
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@aktibguard.lab
+      PGADMIN_DEFAULT_PASSWORD: AktibGuard2024Lab!
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
+    volumes:
+      - pgadmin_lab_data:/var/lib/pgadmin
+    ports:
+      - "8080:80"
+    networks:
+      - aktibguard-lab-network
+    depends_on:
+      - database
+
+  # Redis Admin (RedisInsight) - Laboratory
+  redis-insight:
+    image: redislabs/redisinsight:latest
+    container_name: aktibguard-redis-insight-lab
+    restart: unless-stopped
+    volumes:
+      - redis_insight_lab_data:/db
+    ports:
+      - "8001:8001"
+    networks:
+      - aktibguard-lab-network
+    depends_on:
+      - redis
+
+  # ============================================================================
+  # MOCK SERVICES FOR TESTING
+  # ============================================================================
+
+  # Mock API Server for Backend Simulation
+  mock-backend:
+    image: node:18-alpine
+    container_name: aktibguard-mock-backend
+    restart: unless-stopped
+    working_dir: /app
+    command: >
+      sh -c "
+        npm install -g json-server &&
+        echo 'Starting Mock Backend Server...' &&
+        json-server --watch /app/mock-data.json --host 0.0.0.0 --port 3000 --routes /app/routes.json
+      "
+    volumes:
+      - ./laboratory/mock-backend:/app
+    ports:
+      - "3000:3000"
+    networks:
+      - aktibguard-lab-network
+    environment:
+      NODE_ENV: development
+
+# ============================================================================
+# NETWORKS
+# ============================================================================
+networks:
+  aktibguard-lab-network:
+    driver: bridge
+    name: aktibguard-lab-network
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16
+
+# ============================================================================
+# VOLUMES
+# ============================================================================
+volumes:
+  # Database
+  postgres_lab_data:
+    name: aktibguard-postgres-lab-data
+  redis_lab_data:
+    name: aktibguard-redis-lab-data
+  
+  # Application
+  frontend_lab_build:
+    name: aktibguard-frontend-lab-build
+  
+  # Admin Tools
+  pgadmin_lab_data:
+    name: aktibguard-pgadmin-lab-data
+  redis_insight_lab_data:
+    name: aktibguard-redis-insight-lab-data
