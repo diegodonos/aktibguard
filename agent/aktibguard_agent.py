@@ -25,7 +25,6 @@ from typing import Dict, List, Optional, Any
 
 import psutil
 import requests
-from cryptography.fernet import Fernet
 from dotenv import load_dotenv
 
 class AktibGuardAgent:

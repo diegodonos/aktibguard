@@ -69,18 +69,9 @@ setup_agent() {
     
     cd agent
     
-    # Create virtual environment if it doesn't exist
-    if [ ! -d "venv" ]; then
-        print_status "Creating Python virtual environment..."
-        python3 -m venv venv
-    fi
-    
-    # Activate virtual environment
-    source venv/bin/activate
-    
-    # Install dependencies
+    # Install dependencies globally (simpler for testing)
     print_status "Installing Python dependencies..."
-    pip install -r requirements.txt
+    pip3 install --user -r requirements.txt
     
     # Create agent config
     if [ ! -f ".env" ]; then
@@ -177,7 +168,6 @@ start_agent() {
     print_status "Starting AktibGuard agent..."
     
     cd agent
-    source venv/bin/activate
     python3 aktibguard_agent.py &
     AGENT_PID=$!
     cd ..
@@ -190,7 +180,6 @@ test_agent() {
     print_status "Testing agent connection..."
     
     cd agent
-    source venv/bin/activate
     python3 aktibguard_agent.py --test
     cd ..
     
