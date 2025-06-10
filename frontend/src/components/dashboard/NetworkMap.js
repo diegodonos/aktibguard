@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, Typography, Box, Chip } from '@mui/material';
 import { Hub as NetworkIcon } from '@mui/icons-material';
 import { motion } from 'framer-motion';
@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 const NetworkMap = () => {
   const [connections, setConnections] = useState([]);
 
-  const nodes = [
+  const nodes = useMemo(() => [
     { id: 'firewall', label: 'Firewall', x: 50, y: 20, type: 'security', status: 'online' },
     { id: 'server1', label: 'Server-01', x: 20, y: 50, type: 'server', status: 'online' },
     { id: 'server2', label: 'Server-02', x: 80, y: 50, type: 'server', status: 'warning' },
@@ -15,7 +15,7 @@ const NetworkMap = () => {
     { id: 'desktop2', label: 'Desktop-02', x: 35, y: 80, type: 'endpoint', status: 'offline' },
     { id: 'laptop1', label: 'Laptop-01', x: 65, y: 80, type: 'endpoint', status: 'online' },
     { id: 'laptop2', label: 'Laptop-02', x: 85, y: 80, type: 'endpoint', status: 'critical' },
-  ];
+  ], []);
 
   const connectionLines = [
     { from: 'firewall', to: 'switch' },

@@ -7,7 +7,6 @@ import {
   Typography,
   IconButton,
   useTheme,
-  useMediaQuery,
   Badge,
   Avatar,
   Menu,
