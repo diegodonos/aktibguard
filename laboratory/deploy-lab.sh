@@ -187,6 +187,15 @@ cleanup() {
 main() {
     print_header
     
+    # Change to project root directory
+    if [ -f "../.env.lab" ]; then
+        cd ..
+        print_status "Working from project root directory"
+    elif [ ! -f ".env.lab" ]; then
+        print_error "Cannot find .env.lab file. Please run from project root or laboratory directory."
+        exit 1
+    fi
+    
     # Set up cleanup on exit
     trap cleanup EXIT
     
